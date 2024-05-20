@@ -41,6 +41,9 @@ Create a `.env` file from the environment template file `env.example`
 Available variables:
 | Variable Name         | Default value                     | Description                                                                                       |
 |-----------------------|-----------------------------------|---------------------------------------------------------------------------------------------------|
+| ALFRESCO_URL          | http://localhost:8080             | REQUIRED - Base URL to the ACS instance                                                           |
+| ALFRESCO_USERNAME     | admin                             | REQUIRED - Username for the ACS instance                                                          |
+| ALFRESCO_PASSWORD     | admin                             | REQUIRED - Password for the ACS instance                                                          |
 | OLLAMA_BASE_URL       | http://host.docker.internal:11434 | REQUIRED - URL to Ollama LLM API                                                                  |
 | NEO4J_URI             | neo4j://database:7687             | REQUIRED - URL to Neo4j database                                                                  |
 | NEO4J_USERNAME        | neo4j                             | REQUIRED - Username for Neo4j database                                                            |
