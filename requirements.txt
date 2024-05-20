@@ -1,0 +1,10 @@
+openai
+python-dotenv
+neo4j
+streamlit
+sentence_transformers==2.2.2
+torch==2.0.1
+boto3
+langchain-openai
+langchain-community
+langchain-google-genai
