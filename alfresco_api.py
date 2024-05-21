@@ -15,7 +15,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
         }
         return requests.post(url, json=body, auth=self.auth).json()
 
-    def get_folder_ids(self, folder_name):
+    def get_folder_ids(self, folder_name: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
         body = {
             "query": {
@@ -25,7 +25,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
         }
         return requests.post(url, json=body, auth=self.auth).json()
 
-    def get_nodes_ids_by_extension(self, extension):
+    def get_nodes_ids_by_extension(self, extension: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
         body = {
             "query": {
@@ -40,7 +40,7 @@ class AlfrescoNodeAPI(AlfrescoAPI):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
         return requests.get(url, auth=self.auth).content.decode("utf-8")
 
-    def copy_to_folder(self, node_id, folder_id):
+    def copy_to_folder(self, node_id: str, folder_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/copy"
         body = {
             "targetParentId": f"{folder_id}"
