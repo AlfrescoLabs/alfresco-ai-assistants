@@ -112,8 +112,7 @@ def translate_content(document_title: str, language: str) -> str:
 
 @tool
 def redact_content(document_title: str, user_request: str) -> str:
-    """Find and redact / censor the content of a document within Alfresco Content Services (ACS).
-       The user can request specific information to be redacted."""
+    """Find and redact / censor the content of a document within Alfresco Content Services (ACS). The user can request specific information to be redacted."""
     document = get_document_content(document_title)
     if document == DOCUMENT_NOT_FOUND:
         return DOCUMENT_NOT_FOUND
