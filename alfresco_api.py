@@ -21,11 +21,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
             "query": {
                 "query": f"cm:name:{folder_name} and TYPE:folder",
                 "language": "afts"
-            },
-            "paging": {
-                "maxItems": 100,
-                "skipCount": 0
-            },
+            }
         }
         return requests.post(url, json=body, auth=self.auth).json()
 
