@@ -37,6 +37,7 @@ node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
 discovery_api = AlfrescoDiscoveryAPI(alfresco_url, alfresco_username, alfresco_password)
 
 DOCUMENT_NOT_FOUND = "Document not found. Please try again."
+FOLDER_NOT_FOUND = "Folder not found. Please try again."
 
 logger = get_logger(__name__)
 set_debug(True)
@@ -76,6 +77,32 @@ def get_document_content(document_title: str) -> dict:
     response = node_api.get_node_content(node_id)
     return {"document_title": document_title, "content": response}
 
+def copy_files_with_extension_to_folder(extension: str, folder_name: str) -> dict:
+    search_response = search_api.get_folder_ids(folder_name)
+    try:
+        folder_id = search_response["list"]["entries"][0]["entry"]["id"]
+    except IndexError:
+        return FOLDER_NOT_FOUND
+
+    search_response = search_api.get_nodes_ids_by_extension(extension)
+    try:
+        node_ids = [entry["entry"]["id"] for entry in (search_response)["list"]["entries"]]
+    except KeyError:
+        return DOCUMENT_NOT_FOUND
+
+    copied_files = []
+    errors = []
+    for node_id in node_ids:
+        response = node_api.copy_to_folder(node_id, folder_id)
+        try:
+            filename = response["entry"]["name"]
+            copied_files.append({"copied_filename": filename})
+        except KeyError:
+            error = response["error"]
+            errors.append({"error": error})
+
+    return {"copied_files_successfully": copied_files, "errors": errors}
+
 @tool
 def multiply(first_int: int, second_int: int) -> int:
     """Multiply two integers together."""
@@ -103,8 +130,13 @@ def translate_content(document_title: str, language: str) -> str:
     st.write_stream(response)
     return None
 
+@tool
+def copy_files_to_folder(extension: str, folder_name: str) -> dict:
+    """Copy files with the given extension to given folder and return the names of files that were successfully copied and describe all errors."""
+    return copy_files_with_extension_to_folder(extension, folder_name)
 
-tools = [multiply, discovery, transform_content, translate_content]
+
+tools = [multiply, discovery, transform_content, translate_content, copy_files_to_folder]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are an assistant that has access to the following set of tools. Here are the names and descriptions for each tool:
