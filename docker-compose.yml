@@ -76,15 +76,15 @@ services:
         - action: rebuild
           path: .
           ignore:
-            - alfresco_sdk_assistant.py
+            - alfresco_ai_assistant.py
             - alfresco_api.py
     ports:
       - 8503:8503
 
-  alfresco_sdk_assistant:
+  alfresco_ai_assistant:
     build:
       context: .
-      dockerfile: alfresco_sdk_assistant.Dockerfile
+      dockerfile: alfresco_ai_assistant.Dockerfile
     environment:
       - ALFRESCO_URL=${ALFRESCO_URL-http://localhost:8080}
       - ALFRESCO_USERNAME=${ALFRESCO_USERNAME-admin}
