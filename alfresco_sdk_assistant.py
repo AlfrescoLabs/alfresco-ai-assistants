@@ -33,6 +33,11 @@ os.environ["NEO4J_URL"] = url
 
 logger = get_logger(__name__)
 set_debug(True)
+llm = load_llm(llm_name, logger=logger, config={"ollama_base_url": ollama_base_url})
+
+translate_prompt = PromptTemplate(
+    template="""Original: {to_translate}. {language}:""",
+ input_variables=["to_translate", "language"])
 
 json_response_prompt = PromptTemplate(
     template="""You are an assistant that extracts relevant data from JSON, and translates that relevant data into natural language.
@@ -49,9 +54,27 @@ Don't include anything in the response other than the requested data, in natural
 Generate a comprehensive and informative answer of 80 words or less for the \
 given question based solely on the provided JSON response. Do not mention the JSON response in your answer.
 Use formatting to make your answer more readable.
+The response must use the language required by the question and it must never mix different languages.
 
 Question: {question}""",
  input_variables=["json_response", "question"])
+
+def get_document_content(document_title: str) -> dict:
+    search_url = f"{alfresco_url}/alfresco/api/-default-/public/search/versions/1/search"
+    search_body = {
+        "query": {
+            "query": f"cm:name:\"{document_title}\""
+        }
+    }
+    search_response = requests.post(search_url, json=search_body, auth=(alfresco_username, alfresco_password)).json()
+    try:
+        node_id = search_response["list"]["entries"][0]["entry"]["id"]
+    except IndexError:
+        return "Document not found. Please try again."
+
+    url = f"{alfresco_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
+    response = requests.get(url, auth=(alfresco_username, alfresco_password)).content.decode("utf-8")
+    return {"document_title": document_title, "content": response}
 
 @tool
 def multiply(first_int: int, second_int: int) -> int:
@@ -60,11 +83,26 @@ def multiply(first_int: int, second_int: int) -> int:
 
 @tool
 def discovery() -> dict:
-    """Discover the current Alfresco Content Services version, installed modules, and license status."""
+    """Discover the current Alfresco Content Services (ACS) version, installed modules, and license status."""
     url = f"{alfresco_url}/alfresco/api/discovery"
     return requests.get(url, auth=(alfresco_username, alfresco_password)).json()
 
-tools = [multiply, discovery]
+@tool
+def transform_content(document_title: str) -> dict:
+    """Find and transform (e.g.: summarise, classify) the content of a document within Alfresco Content Services (ACS)."""
+    return get_document_content(document_title)
+
+@tool
+def translate_content(document_title: str, language: str) -> dict:
+    """Find and translate the content of a document within Alfresco Content Services (ACS)."""
+    document = get_document_content(document_title)
+    translate_chain = translate_prompt | llm | StrOutputParser()
+    response = translate_chain.stream({"to_translate": document["content"], "language": language})
+    st.write_stream(response)
+    return None
+
+
+tools = [multiply, discovery, transform_content, translate_content]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are an assistant that has access to the following set of tools. Here are the names and descriptions for each tool:
@@ -73,7 +111,9 @@ system_prompt = f"""You are an assistant that has access to the following set of
 
 Given the user input, return the name and input of the tool to use. Return your response as a JSON blob with 'name' and 'arguments' keys.
 The 'name' key should be the name of the tool to use, and the 'arguments' key should be a dictionary of the arguments to pass to the tool.
-The 'arguments' key should be a dictionary with the argument names as keys and the argument values as values."""
+The 'arguments' key should be a dictionary with the argument names as keys and the argument values as values.
+Only reply with the name and arguments of the tool to use. Do not include any other information in your response.
+Do not include anything before or after the JSON blob."""
 
 prompt = ChatPromptTemplate.from_messages(
     [("system", system_prompt), ("user", "{input}")]
@@ -85,7 +125,6 @@ def tool_chain(model_output):
     return itemgetter("arguments") | chosen_tool
 
 def main():
-    llm = load_llm(llm_name, logger=logger, config={"ollama_base_url": ollama_base_url})
     chain = prompt | llm | JsonOutputParser() | tool_chain
 
     st.header("👨‍🔬I'm your Alfresco SDK AI Assistant!")
@@ -99,7 +138,7 @@ def main():
             json_chain = json_response_prompt | llm | StrOutputParser()
             response = json_chain.stream({"json_response": response, "question": input})
             st.write_stream(response)
-        else:
+        elif response:
             st.write(response)
 
 
