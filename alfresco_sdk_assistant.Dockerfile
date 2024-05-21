@@ -13,6 +13,7 @@ COPY requirements.txt .
 RUN pip install --upgrade -r requirements.txt
 
 COPY alfresco_sdk_assistant.py .
+COPY alfresco_api.py .
 COPY commons.py .
 
 EXPOSE 8504

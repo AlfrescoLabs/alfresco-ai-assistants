@@ -1,6 +1,6 @@
 import os
-import requests
 
+from alfresco_api import *
 import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.tools import tool
@@ -30,6 +30,11 @@ alfresco_username = os.getenv("ALFRESCO_USERNAME")
 alfresco_password = os.getenv("ALFRESCO_PASSWORD")
 # Remapping for Langchain Neo4j integration
 os.environ["NEO4J_URL"] = url
+
+# API clients
+search_api = AlfrescoSearchAPI(alfresco_url, alfresco_username, alfresco_password)
+node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
+discovery_api = AlfrescoDiscoveryAPI(alfresco_url, alfresco_username, alfresco_password)
 
 DOCUMENT_NOT_FOUND = "Document not found. Please try again."
 
@@ -62,20 +67,13 @@ Question: {question}""",
  input_variables=["json_response", "question"])
 
 def get_document_content(document_title: str) -> dict:
-    search_url = f"{alfresco_url}/alfresco/api/-default-/public/search/versions/1/search"
-    search_body = {
-        "query": {
-            "query": f"cm:name:\"{document_title}\""
-        }
-    }
-    search_response = requests.post(search_url, json=search_body, auth=(alfresco_username, alfresco_password)).json()
+    search_response = search_api.search_by_name(document_title)
     try:
         node_id = search_response["list"]["entries"][0]["entry"]["id"]
     except IndexError:
         return DOCUMENT_NOT_FOUND
 
-    url = f"{alfresco_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
-    response = requests.get(url, auth=(alfresco_username, alfresco_password)).content.decode("utf-8")
+    response = node_api.get_node_content(node_id)
     return {"document_title": document_title, "content": response}
 
 @tool
@@ -86,8 +84,7 @@ def multiply(first_int: int, second_int: int) -> int:
 @tool
 def discovery() -> dict:
     """Discover the current Alfresco Content Services (ACS) version, installed modules, and license status."""
-    url = f"{alfresco_url}/alfresco/api/discovery"
-    return requests.get(url, auth=(alfresco_username, alfresco_password)).json()
+    return discovery_api.get_repository_info()
 
 @tool
 def transform_content(document_title: str) -> dict:
