@@ -31,6 +31,8 @@ alfresco_password = os.getenv("ALFRESCO_PASSWORD")
 # Remapping for Langchain Neo4j integration
 os.environ["NEO4J_URL"] = url
 
+DOCUMENT_NOT_FOUND = "Document not found. Please try again."
+
 logger = get_logger(__name__)
 set_debug(True)
 llm = load_llm(llm_name, logger=logger, config={"ollama_base_url": ollama_base_url})
@@ -70,7 +72,7 @@ def get_document_content(document_title: str) -> dict:
     try:
         node_id = search_response["list"]["entries"][0]["entry"]["id"]
     except IndexError:
-        return "Document not found. Please try again."
+        return DOCUMENT_NOT_FOUND
 
     url = f"{alfresco_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
     response = requests.get(url, auth=(alfresco_username, alfresco_password)).content.decode("utf-8")
@@ -93,9 +95,12 @@ def transform_content(document_title: str) -> dict:
     return get_document_content(document_title)
 
 @tool
-def translate_content(document_title: str, language: str) -> dict:
+def translate_content(document_title: str, language: str) -> str:
     """Find and translate the content of a document within Alfresco Content Services (ACS)."""
     document = get_document_content(document_title)
+    if document == DOCUMENT_NOT_FOUND:
+        return DOCUMENT_NOT_FOUND
+    
     translate_chain = translate_prompt | llm | StrOutputParser()
     response = translate_chain.stream({"to_translate": document["content"], "language": language})
     st.write_stream(response)
