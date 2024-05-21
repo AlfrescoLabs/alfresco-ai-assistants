@@ -29,7 +29,7 @@ UI: http://localhost:8504
 DB: http://localhost:7474
 
 - perform complex tasks against a live ACS instance based on human requests
-- translate/summarise/redact documents
+- translate/summarise/classify/redact documents
 - find and preview documents
 
 ---
