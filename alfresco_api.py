@@ -13,7 +13,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
                 "query": f"cm:name:\"{document_title}\""
             }
         }
-        return requests.post(url, json=body, auth=(self.username, self.password)).json()
+        return requests.post(url, json=body, auth=self.auth).json()
 
     def get_folder_ids(self, folder_name):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
@@ -27,7 +27,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
                 "skipCount": 0
             },
         }
-        return requests.post(url, json=body, auth=(self.username, self.password)).json()
+        return requests.post(url, json=body, auth=self.auth).json()
 
     def get_nodes_ids_by_extension(self, extension):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
@@ -37,24 +37,22 @@ class AlfrescoSearchAPI(AlfrescoAPI):
                 "language": "afts"
             }
         }
-        return requests.post(url, json=body, auth=(self.username, self.password)).json()
+        return requests.post(url, json=body, auth=self.auth).json()
 
 class AlfrescoNodeAPI(AlfrescoAPI):
     def get_node_content(self, node_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
         return requests.get(url, auth=self.auth).content.decode("utf-8")
-        return requests.get(url, auth=(self.username, self.password)).content.decode("utf-8")
 
     def copy_to_folder(self, node_id, folder_id):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/copy"
         body = {
             "targetParentId": f"{folder_id}"
         }
-        return requests.post(url, json=body, auth=(self.username, self.password)).json()
+        return requests.post(url, json=body, auth=self.auth).json()
 
 
 class AlfrescoDiscoveryAPI(AlfrescoAPI):
     def get_repository_info(self):
         url = f"{self.base_url}/alfresco/api/discovery"
         return requests.get(url, auth=self.auth).json()
-        return requests.get(url, auth=(self.username, self.password)).json()

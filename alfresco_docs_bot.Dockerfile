@@ -14,7 +14,6 @@ RUN pip install --upgrade -r requirements.txt
 
 ADD initial-load initial-load/
 COPY alfresco_docs_bot.py .
-COPY alfresco_api.py .
 COPY commons.py .
 
 EXPOSE 8503

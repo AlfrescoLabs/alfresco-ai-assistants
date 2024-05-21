@@ -132,7 +132,7 @@ def translate_content(document_title: str, language: str) -> str:
 
 @tool
 def copy_files_to_folder(extension: str, folder_name: str) -> dict:
-    """Copy files with the given extension to given folder and return the names of files that were successfully copied and describe all errors."""
+    """Copy files with the given extension to the specified folder and return the names of files that were successfully copied and describe all errors."""
     return copy_files_with_extension_to_folder(extension, folder_name)
 
 
