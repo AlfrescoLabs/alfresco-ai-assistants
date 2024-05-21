@@ -3,8 +3,6 @@ services:
   llm: &llm
     image: ollama/ollama:latest
     profiles: ["linux"]
-    networks:
-      - net
     ports:
       - 11434:11434
 
@@ -27,8 +25,6 @@ services:
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
       - LLM=${LLM-llama3}
-    networks:
-      - net
     tty: true
 
   database:
@@ -49,8 +45,6 @@ services:
         interval: 15s
         timeout: 30s
         retries: 10
-    networks:
-      - net
 
   alfresco_docs_bot:
     build:
@@ -72,8 +66,6 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-    networks:
-      - net
     depends_on:
       database:
         condition: service_healthy
@@ -85,6 +77,7 @@ services:
           path: .
           ignore:
             - alfresco_sdk_assistant.py
+            - alfresco_api.py
     ports:
       - 8503:8503
 
@@ -111,11 +104,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-    networks:
-      - net
     depends_on:
-      database:
-        condition: service_healthy
       pull-model:
         condition: service_completed_successfully
     x-develop:
@@ -126,6 +115,3 @@ services:
             - alfresco_docs_bot.py
     ports:
       - 8504:8504
-
-networks:
-  net:
