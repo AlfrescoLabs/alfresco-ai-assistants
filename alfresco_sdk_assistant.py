@@ -143,6 +143,7 @@ example_messages = [
     ("user", "Is the Alfresco Content Services license up to date?"), ("assistant", '{{"name": "discovery", "arguments": {{}}}}'),
     ("user", "Summarise the content of the document titled 'minutes.docx'"), ("assistant", '{{"name": "transform_content", "arguments": {{"document_title": "minutes.docx"}}}}'),
     ("user", "Translate the content of the document titled 'minutes.docx' to French"), ("assistant", '{{"name": "translate_content", "arguments": {{"document_title": "minutes.docx", "language": "French"}}}}'),
+    ("user", "Redact all mentions of colors and names in 'snowwhite.docx'"), ("assistant", '{{"name": "redact_content", "arguments": {{"document_title": "snowwhite.docx", "user_request": "colors, names"}}}}'),
 ]
 prompt_messages += example_messages
 prompt_messages.append(("user", "{input}"))
