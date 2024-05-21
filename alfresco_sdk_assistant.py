@@ -117,9 +117,17 @@ The 'arguments' key should be a dictionary with the argument names as keys and t
 Only reply with the name and arguments of the tool to use. Do not include any other information in your response.
 Do not include anything before or after the JSON blob."""
 
-prompt = ChatPromptTemplate.from_messages(
-    [("system", system_prompt), ("user", "{input}")]
-)
+prompt_messages = [("system", system_prompt)]
+example_messages = [
+    ("user", "Multiply 12 by 43"), ("assistant", '{{"name": "multiply", "arguments": {{"first_int": 12, "second_int": 43}}}}'),
+    ("user", "Is the Alfresco Content Services license up to date?"), ("assistant", '{{"name": "discovery", "arguments": {{}}}}'),
+    ("user", "Summarise the content of the document titled 'minutes.docx'"), ("assistant", '{{"name": "transform_content", "arguments": {{"document_title": "minutes.docx"}}}}'),
+    ("user", "Translate the content of the document titled 'minutes.docx' to French"), ("assistant", '{{"name": "translate_content", "arguments": {{"document_title": "minutes.docx", "language": "French"}}}}'),
+]
+prompt_messages += example_messages
+prompt_messages.append(("user", "{input}"))
+
+prompt = ChatPromptTemplate.from_messages(prompt_messages)
 
 def tool_chain(model_output):
     tool_map = {tool.name: tool for tool in tools}
