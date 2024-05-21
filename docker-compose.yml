@@ -85,6 +85,7 @@ services:
           path: .
           ignore:
             - alfresco_sdk_assistant.py
+            - alfresco_api.py
     ports:
       - 8503:8503
 
