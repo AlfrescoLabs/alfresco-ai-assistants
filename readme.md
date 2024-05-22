@@ -6,10 +6,10 @@ and customers get the information they need or perform complex tasks, simply con
 
 This repository contains the following applications:
 
-| Name                      | Main files                  | Compose name             | URLs                  | Description                                                                          |
-|---------------------------|-----------------------------|--------------------------|-----------------------|--------------------------------------------------------------------------------------|
-| Alfresco Docs Bot         | `alfresco_docs_bot.py`      | `alfresco_docs_bot`      | http://localhost:8503 | Ingest the Alfresco documentation and ask it questions.                              |
-| Alfresco SDK AI Assistant | `alfresco_sdk_assistant.py` | `alfresco_sdk_assistant` | http://localhost:8504 | Interact with an Alfresco Content Services instance using natural language requests. |
+| Name                  | Main files                 | Compose name            | URLs                  | Description                                                                          |
+|-----------------------|----------------------------|-------------------------|-----------------------|--------------------------------------------------------------------------------------|
+| Alfresco Docs Bot     | `alfresco_docs_bot.py`     | `alfresco_docs_bot`     | http://localhost:8503 | Ingest the Alfresco documentation and ask it questions.                              |
+| Alfresco AI Assistant | `alfresco_ai_assistant.py` | `alfresco_ai_assistant` | http://localhost:8504 | Interact with an Alfresco Content Services instance using natural language requests. |
 
 The database can be explored at http://localhost:7474.
 
@@ -23,14 +23,18 @@ DB: http://localhost:7474
 
 ---
 
-## App 2 - Alfresco SDK AI Assistant
+## App 2 - Alfredo, the Alfresco AI Assistant
 
 UI: http://localhost:8504
 DB: http://localhost:7474
 
 - perform complex tasks against a live ACS instance based on human requests
-- translate/summarise/classify/redact documents
 - find and preview documents
+- show recent document snippets matching a search term
+- transform (e.g.: translate/summarise/classify) documents
+- redact documents
+- copy a document into a specified folder
+- answer questions about the ACS deployment
 
 ---
 
