@@ -23,12 +23,8 @@ llm(LLM 🤖)
 vectordb[(Vector database)]
 raw-docs{{Raw Documentation 📚}}
 
-user --query--> llm
-
-llm --load--> vectordb
-
+user --query-embedded-data--> vectordb
 vectordb --relevant-data--> llm
-
 llm --final answer--> user
 
 raw-docs --extraction/chunking/embedding---> vectordb
