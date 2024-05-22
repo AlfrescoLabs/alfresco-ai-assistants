@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from alfresco_api import *
 import streamlit as st
@@ -134,7 +135,7 @@ def list_recent_content_snippets(search_term: str) -> dict:
             "edited_date": entry["entry"]["modifiedAt"],
             "highlight_snippets": entry["entry"]["search"]["highlight"][0]["snippets"]
         }
-        results[entry["file_name"]] = entry
+        results[f"{entry['file_name']}_{uuid.uuid4()}"] = entry
 
     return results
 
