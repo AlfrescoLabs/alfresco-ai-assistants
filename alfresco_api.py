@@ -14,11 +14,29 @@ class AlfrescoSearchAPI(AlfrescoAPI):
             }
         }
         return requests.post(url, json=body, auth=self.auth).json()
-    
+
+    def search_folders_by_name(self, folder_name: str):
+        url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
+        body = {
+            "query": {
+                "query": f"cm:name:{folder_name} and TYPE:folder",
+                "language": "afts"
+            }
+        }
+        return requests.post(url, json=body, auth=self.auth).json()
+
 class AlfrescoNodeAPI(AlfrescoAPI):
     def get_node_content(self, node_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
         return requests.get(url, auth=self.auth).content.decode("utf-8")
+
+    def copy_to_folder(self, node_id: str, folder_id: str):
+        url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/copy"
+        body = {
+            "targetParentId": f"{folder_id}"
+        }
+        return requests.post(url, json=body, auth=self.auth).json()
+
 
 class AlfrescoDiscoveryAPI(AlfrescoAPI):
     def get_repository_info(self):
