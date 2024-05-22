@@ -157,7 +157,7 @@ def tool_chain(model_output):
 def main():
     chain = prompt | llm | JsonOutputParser() | tool_chain
 
-    st.header("👨‍🔬I'm your Alfresco SDK AI Assistant!")
+    st.header("🤹‍♂️I'm Alfredo, your Alfresco AI Assistant!")
 
     # Accept user questions
     input = st.text_input("What do you want to do today? Ask me anything:")
