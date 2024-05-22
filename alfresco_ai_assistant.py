@@ -203,7 +203,7 @@ Key Features:
 * Create non-electronic records: Declare physical records, such as paper documents or microfilm, as digital records within Alfresco.
 * Classify and declare files as records: Identify important files and classify them as records, ensuring they are properly managed and retained.
 * Import and export File Plan content: Seamlessly move content between File Plans, making it easy to build and manage your Records Management system.
-* Export search results: Quickly retrieve and export search results in Alfresco Content Package (ACP) format."}}}}""".replace('\n', '\\n'))
+* Export search results: Quickly retrieve and export search results in Alfresco Content Package (ACP) format."}}}}""".replace('\n', '\\n')),
 ]
 prompt_messages += example_messages
 prompt_messages.append(("user", "{input}"))
