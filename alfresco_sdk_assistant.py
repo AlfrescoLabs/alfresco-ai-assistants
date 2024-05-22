@@ -43,6 +43,13 @@ logger = get_logger(__name__)
 set_debug(True)
 llm = load_llm(llm_name, logger=logger, config={"ollama_base_url": ollama_base_url})
 
+redact_prompt = PromptTemplate(
+    template="""Redact all references to {request} from the following document.
+Replace the redacted information with the "[REDACTED]" placeholder.
+
+Document: {to_redact}""",
+ input_variables=["to_redact", "request"])
+
 translate_prompt = PromptTemplate(
     template="""Original: {to_translate}. {language}:""",
  input_variables=["to_translate", "language"])
@@ -124,9 +131,21 @@ def translate_content(document_title: str, language: str) -> str:
     document = get_document_content(document_title)
     if document == DOCUMENT_NOT_FOUND:
         return DOCUMENT_NOT_FOUND
-    
+
     translate_chain = translate_prompt | llm | StrOutputParser()
     response = translate_chain.stream({"to_translate": document["content"], "language": language})
+    st.write_stream(response)
+    return None
+
+@tool
+def redact_content(document_title: str, user_request: str) -> str:
+    """Find and redact / censor the content of a document within Alfresco Content Services (ACS). The user can request specific information to be redacted."""
+    document = get_document_content(document_title)
+    if document == DOCUMENT_NOT_FOUND:
+        return DOCUMENT_NOT_FOUND
+
+    redact_chain = redact_prompt | llm | StrOutputParser()
+    response = redact_chain.stream({"to_redact": document["content"], "request": user_request})
     st.write_stream(response)
     return None
 
@@ -135,11 +154,10 @@ def copy_files_to_folder(extension: str, folder_name: str) -> dict:
     """Copy files with the given extension within Alfresco Content Services (ACS) to the specified folder."""
     return copy_files_with_extension_to_folder(extension, folder_name)
 
-
-tools = [multiply, discovery, transform_content, translate_content, copy_files_to_folder]
+tools = [multiply, discovery, transform_content, translate_content, redact_content, copy_files_to_folder]
 rendered_tools = render_text_description(tools)
 
-system_prompt = f"""You are an assistant that has access to the following set of tools. Here are the names and descriptions for each tool:
+system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:
 
 {rendered_tools}
 
@@ -147,11 +165,20 @@ Given the user input, return the name and input of the tool to use. Return your 
 The 'name' key should be the name of the tool to use, and the 'arguments' key should be a dictionary of the arguments to pass to the tool.
 The 'arguments' key should be a dictionary with the argument names as keys and the argument values as values.
 Only reply with the name and arguments of the tool to use. Do not include any other information in your response.
-Do not include anything before or after the JSON blob."""
+Do not include anything before or after the JSON blob. Do not mention that you are providing a JSON response, only provide the JSON blob and nothing else."""
 
-prompt = ChatPromptTemplate.from_messages(
-    [("system", system_prompt), ("user", "{input}")]
-)
+prompt_messages = [("system", system_prompt)]
+example_messages = [
+    ("user", "Multiply 12 by 43"), ("assistant", '{{"name": "multiply", "arguments": {{"first_int": 12, "second_int": 43}}}}'),
+    ("user", "Is the Alfresco Content Services license up to date?"), ("assistant", '{{"name": "discovery", "arguments": {{}}}}'),
+    ("user", "Summarise the content of the document titled 'minutes.docx'"), ("assistant", '{{"name": "transform_content", "arguments": {{"document_title": "minutes.docx"}}}}'),
+    ("user", "Translate the content of the document titled 'minutes.docx' to French"), ("assistant", '{{"name": "translate_content", "arguments": {{"document_title": "minutes.docx", "language": "French"}}}}'),
+    ("user", "Redact all mentions of colors and names in 'snowwhite.docx'"), ("assistant", '{{"name": "redact_content", "arguments": {{"document_title": "snowwhite.docx", "user_request": "colors, names"}}}}'),
+]
+prompt_messages += example_messages
+prompt_messages.append(("user", "{input}"))
+
+prompt = ChatPromptTemplate.from_messages(prompt_messages)
 
 def tool_chain(model_output):
     tool_map = {tool.name: tool for tool in tools}
