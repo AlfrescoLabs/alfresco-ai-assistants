@@ -74,7 +74,6 @@ llm --final answer--> user
 Access at:
 
 - UI: http://localhost:8504
-- DB: http://localhost:7474
 
 Features:
 
