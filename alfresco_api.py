@@ -50,6 +50,7 @@ class AlfrescoNodeAPI(AlfrescoAPI):
     def get_node_content(self, node_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
         return requests.get(url, auth=self.auth).content.decode("utf-8")
+
     def upload_file(self, file_path: str, parent_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{parent_id}/children"
         files = {"filedata": open(file_path, "rb")}
