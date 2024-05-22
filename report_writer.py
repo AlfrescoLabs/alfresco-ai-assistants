@@ -24,7 +24,7 @@ class ReportWriter:
         elements.append(spacer)
 
         d = Drawing(500, 1)
-        line = Line(-15, 0, 300, 0)
+        line = Line(-15, 0, 451, 0)
         line.strokeColor = colors[4]
         line.strokeWidth = 2
         d.add(line)
@@ -34,7 +34,7 @@ class ReportWriter:
         elements.append(spacer)
 
         d = Drawing(500, 1)
-        line = Line(-15, 0, 300, 0)
+        line = Line(-15, 0, 451, 0)
         line.strokeColor = colors[4]
         line.strokeWidth = 0.5
         d.add(line)
@@ -51,7 +51,7 @@ class ReportWriter:
         elements.append(spacer)
 
         d = Drawing(500, 1)
-        line = Line(-15, 0, 300, 0)
+        line = Line(-15, 0, 451, 0)
         line.strokeColor = colors[4]
         line.strokeWidth = 2
         d.add(line)
@@ -61,7 +61,7 @@ class ReportWriter:
         elements.append(spacer)
 
         d = Drawing(500, 1)
-        line = Line(-15, 0, 300, 0)
+        line = Line(-15, 0, 451, 0)
         line.strokeColor = colors[4]
         line.strokeWidth = 0.5
         d.add(line)
@@ -88,7 +88,7 @@ class ReportWriter:
             elements.append(spacer)
 
             d = Drawing(500, 1)
-            line = Line(-15, 0, 300, 0)
+            line = Line(-15, 0, 451, 0)
             line.strokeColor = colors[4-i]
             line.strokeWidth = 2
             d.add(line)
@@ -100,7 +100,7 @@ class ReportWriter:
         def drawImage(canvas, doc):
             canvas.drawImage("static/jp_logo.png", 0.5 * inch, doc.height + 0.1 * inch,
                             width=2 * inch, height=2 * inch, preserveAspectRatio=True, mask='auto')
-            canvas.drawImage("static/alf_logo.png", doc.width - 0.2 * inch, doc.height + 0.3 * inch,
+            canvas.drawImage("static/alf_logo.png", doc.width - 0.2 * inch, doc.height + 0.4 * inch,
                             width=1.5 * inch, height=1.5 * inch, preserveAspectRatio=True, mask='auto')
         frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='normal')
         pageTemplate = PageTemplate(frames=frame, onPage=drawImage)
