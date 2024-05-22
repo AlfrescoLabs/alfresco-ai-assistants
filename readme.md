@@ -1,8 +1,9 @@
 # Alfresco AI Assistants
+
 This repository contains several Alfresco [AI Assistants](https://en.wikipedia.org/wiki/Virtual_assistant) to help users
 and customers get the information they need or perform complex tasks, simply conveying each request via natural language.
 
-# Applications
+## Applications
 
 This repository contains the following applications:
 
@@ -13,7 +14,7 @@ This repository contains the following applications:
 
 The database can be explored at http://localhost:7474.
 
-## App 1 - Alfresco Docs Bot
+### App 1 - Alfresco Docs Bot
 
 UI: http://localhost:8503
 DB: http://localhost:7474
@@ -21,9 +22,19 @@ DB: http://localhost:7474
 - answer questions based on the specified product's documentation
 - answers will purely be based on Alfresco Docs content
 
----
+```mermaid
+graph LR
+user
+ai
 
-## App 2 - Alfredo, the Alfresco AI Assistant
+user --query--> ai
+
+ai --load--> RAG-user-docs
+
+ai --final answer--> user
+```
+
+### App 2 - Alfredo, the Alfresco AI Assistant
 
 UI: http://localhost:8504
 DB: http://localhost:7474
@@ -37,9 +48,36 @@ DB: http://localhost:7474
 - answer questions about the ACS deployment
 - generate PDF reports and upload them to ACS
 
----
+```mermaid
+graph BT
+user
+ai
+api
 
-# Configure
+subgraph api
+  discovery-api
+  search-api
+  node-api
+end
+
+subgraph tools
+  discovery
+  transform
+  redact
+end
+
+user --query--> ai
+
+ai --choose--> tools
+
+tools --invoke--> api
+
+api --feed data--> ai
+
+ai --final answer--> user
+```
+
+## Configure
 
 Create a `.env` file from the environment template file `env.example`
 
@@ -68,9 +106,9 @@ Available variables:
 > [!WARNING]
 > The applications have been tested only with Ollama, and specifically llama3, they are not guaranteed to work with other LLMs.
 
-## LLM Configuration
+### LLM Configuration
 
-**Ollama**
+#### Ollama
 
 No need to install Ollama manually, it will run in a container as
 part of the stack when running with the Linux profile: run `docker compose --profile linux up`.
@@ -80,39 +118,43 @@ To use the Linux-GPU profile: run `docker compose --profile linux-gpu up`. Also 
 
 If, for whatever reason, you're unable to run the Ollama container, you can instead install it and run it locally as an alternative option.
 
-# Develop
+## Develop
 
 > [!WARNING]
 > There is a performance issue that impacts python applications in the `4.24.x` releases of Docker Desktop. Please upgrade to the latest release before using this stack.
 
 **To start everything**
-```
+
+```sh
 docker compose up
 ```
 
 If changes to build scripts have been made, **rebuild**.
-```
+
+```sh
 docker compose up --build
 ```
 
 To enter **watch mode** (auto rebuild on file changes).
 First start everything, then in new terminal:
-```
+
+```sh
 docker compose watch
 ```
 
 **Shutdown**
 If health check fails or containers don't start up as expected, shutdown
 completely to start up again.
-```
+
+```sh
 docker compose down
 ```
 
-# Scripts
+## Scripts
 
 Scripts that may be required to prepare data for the applications to run correctly, they can all be found under [./scripts](./scripts/).
 
-## transformer.py
+### transformer.py
 
 [transformer.py](./scripts/transformer.py) is a script that should be run against a local clone of the [docs-alfresco](https://github.com/Alfresco/docs-alfresco)
 repository in order to create the `initial-load` folder with all the expected documentation for the Alfresco Docs bot.
