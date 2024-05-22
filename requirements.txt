@@ -8,3 +8,4 @@ boto3
 langchain-openai
 langchain-community
 langchain-google-genai
+reportlab

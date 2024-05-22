@@ -1,6 +1,7 @@
 import os
 
 from alfresco_api import *
+from report_writer import ReportWriter
 import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.tools import tool
@@ -35,6 +36,7 @@ os.environ["NEO4J_URL"] = url
 search_api = AlfrescoSearchAPI(alfresco_url, alfresco_username, alfresco_password)
 node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
 discovery_api = AlfrescoDiscoveryAPI(alfresco_url, alfresco_username, alfresco_password)
+report_writer = ReportWriter()
 
 DOCUMENT_NOT_FOUND = "Document not found. Please try again."
 
@@ -103,8 +105,14 @@ def translate_content(document_title: str, language: str) -> str:
     st.write_stream(response)
     return None
 
+@tool
+def create_pdf_report(document_title, document_text) -> str:
+    """Create a PDF report containing the given text content."""
+    report_writer.write_report(document_title, document_text)
+    node_api.upload_file(f"{document_title}.pdf", "8bb36efb-c26d-4d2b-9199-ab6922f53c28")
+    return f'{document_title}.pdf created!'
 
-tools = [multiply, discovery, transform_content, translate_content]
+tools = [multiply, discovery, transform_content, translate_content, create_pdf_report]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are an assistant that has access to the following set of tools. Here are the names and descriptions for each tool:
