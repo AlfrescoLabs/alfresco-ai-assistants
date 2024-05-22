@@ -38,6 +38,7 @@ node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
 discovery_api = AlfrescoDiscoveryAPI(alfresco_url, alfresco_username, alfresco_password)
 
 DOCUMENT_NOT_FOUND = "Document not found. Please try again."
+FOLDER_NOT_FOUND = "Folder not found. Please try again."
 
 logger = get_logger(__name__)
 set_debug(True)
@@ -119,6 +120,30 @@ def redact_content(document_title: str, user_request: str) -> str:
     return None
 
 @tool
+def copy_file(filename: str, folder_name: str) -> dict:
+    """Copy file within Alfresco Content Services (ACS) to the specified folder."""
+    folders = search_api.search_folders_by_name(folder_name)
+    try:
+        folder_id = folders["list"]["entries"][0]["entry"]["id"]
+        folder_name = folders["list"]["entries"][0]["entry"]["name"]
+    except IndexError:
+        return FOLDER_NOT_FOUND
+
+    documents = search_api.search_by_name(filename)
+    try:
+        node_id = documents["list"]["entries"][0]["entry"]["id"]
+    except IndexError:
+        return DOCUMENT_NOT_FOUND
+
+    response = node_api.copy_to_folder(node_id, folder_id)
+    try:
+        filename = response["entry"]["name"]
+        return {"successfully_copied_file": filename, "destination_folder": folder_name}
+    except KeyError:
+        error = response["error"]
+        return {"error": error}
+
+@tool
 def list_recent_content_snippets(search_term: str) -> dict:
     """Find and show the snippets of recent documents within Alfresco Content Services (ACS) that contain a certain search term."""
     response = search_api.search_recent_docs_snippets(search_term)
@@ -139,7 +164,7 @@ def list_recent_content_snippets(search_term: str) -> dict:
 
     return results
 
-tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets]
+tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:
@@ -159,6 +184,7 @@ example_messages = [
     ("user", "Translate the content of the document titled 'minutes.docx' to French"), ("assistant", '{{"name": "translate_content", "arguments": {{"document_title": "minutes.docx", "language": "French"}}}}'),
     ("user", "Redact all mentions of colors and names in 'snowwhite.docx'"), ("assistant", '{{"name": "redact_content", "arguments": {{"document_title": "snowwhite.docx", "user_request": "colors, names"}}}}'),
     ("user", "Show snippets of recent documents that contain the term 'contract'"), ("assistant", '{{"name": "list_recent_content_snippets", "arguments": {{"search_term": "contract"}}}}'),
+    ("user", "Copy 'minutes.docx' to the 'Board Meetings' folder"), ("assistant", '{{"name": "copy_file", "arguments": {{"filename": "minutes.docx", "folder_name": "Board Meetings"}}}}'),
 ]
 prompt_messages += example_messages
 prompt_messages.append(("user", "{input}"))
