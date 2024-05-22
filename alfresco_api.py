@@ -15,6 +15,27 @@ class AlfrescoSearchAPI(AlfrescoAPI):
         }
         return requests.post(url, json=body, auth=self.auth).json()
     
+    def search_recent_docs_snippets(self, search_term: str):
+        url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
+        body = {
+            "query": {
+                "query": f"TEXT:\"{search_term}\" and TYPE:content and @cm:modified:[NOW-1DAY TO NOW]"
+                },
+                "highlight": {
+                    "snippetCount": 10,
+                    "fragmentSize": 256,
+                    "mergeContiguous": True,
+                    "fields": [
+                        {
+                            "field": "cm:content",
+                            "prefix": "**",
+                            "postfix": "**"
+                        }
+                    ]
+                }
+            }
+        return requests.post(url, json=body, auth=self.auth).json()
+    
 class AlfrescoNodeAPI(AlfrescoAPI):
     def get_node_content(self, node_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
