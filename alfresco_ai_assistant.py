@@ -84,31 +84,26 @@ def get_document_content(document_title: str) -> dict:
     response = node_api.get_node_content(node_id)
     return {"document_title": document_title, "content": response}
 
-def copy_files_with_extension_to_folder(extension: str, folder_name: str) -> dict:
-    search_response = search_api.get_folder_ids(folder_name)
+def copy_file_to_folder(filename: str, folder_name: str) -> dict:
+    search_response = search_api.search_folders_by_name(folder_name)
     try:
         folder_id = search_response["list"]["entries"][0]["entry"]["id"]
     except IndexError:
         return FOLDER_NOT_FOUND
 
-    search_response = search_api.get_nodes_ids_by_extension(extension)
+    search_response = search_api.search_by_name(filename)
     try:
-        node_ids = [entry["entry"]["id"] for entry in (search_response)["list"]["entries"]]
-    except KeyError:
+        node_id = search_response["list"]["entries"][0]["entry"]["id"]
+    except IndexError:
         return DOCUMENT_NOT_FOUND
 
-    copied_files = []
-    errors = []
-    for node_id in node_ids:
-        response = node_api.copy_to_folder(node_id, folder_id)
-        try:
-            filename = response["entry"]["name"]
-            copied_files.append({"copied_filename": filename})
-        except KeyError:
-            error = response["error"]
-            errors.append({"error": error})
-
-    return {"copied_files_successfully": copied_files, "errors": errors}
+    response = node_api.copy_to_folder(node_id, folder_id)
+    try:
+        filename = response["entry"]["name"]
+        return {"copied_filename": filename}
+    except KeyError:
+        error = response["error"]
+        return {"error": error}
 
 @tool
 def multiply(first_int: int, second_int: int) -> int:
@@ -150,11 +145,11 @@ def redact_content(document_title: str, user_request: str) -> str:
     return None
 
 @tool
-def copy_files_to_folder(extension: str, folder_name: str) -> dict:
-    """Copy files with the given extension within Alfresco Content Services (ACS) to the specified folder."""
-    return copy_files_with_extension_to_folder(extension, folder_name)
+def copy_file(filename: str, folder_name: str) -> dict:
+    """Copy file within Alfresco Content Services (ACS) to the specified folder."""
+    return copy_file_to_folder(filename, folder_name)
 
-tools = [multiply, discovery, transform_content, translate_content, redact_content, copy_files_to_folder]
+tools = [multiply, discovery, transform_content, translate_content, redact_content, copy_file]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:

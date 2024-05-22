@@ -15,21 +15,11 @@ class AlfrescoSearchAPI(AlfrescoAPI):
         }
         return requests.post(url, json=body, auth=self.auth).json()
 
-    def get_folder_ids(self, folder_name: str):
+    def search_folders_by_name(self, folder_name: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
         body = {
             "query": {
                 "query": f"cm:name:{folder_name} and TYPE:folder",
-                "language": "afts"
-            }
-        }
-        return requests.post(url, json=body, auth=self.auth).json()
-
-    def get_nodes_ids_by_extension(self, extension: str):
-        url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
-        body = {
-            "query": {
-                "query": f"cm:name:*.{extension} and TYPE:content",
                 "language": "afts"
             }
         }
