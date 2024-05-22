@@ -2,6 +2,7 @@ import os
 import uuid
 
 from alfresco_api import *
+from report_writer import ReportWriter
 import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.tools import tool
@@ -36,6 +37,7 @@ os.environ["NEO4J_URL"] = url
 search_api = AlfrescoSearchAPI(alfresco_url, alfresco_username, alfresco_password)
 node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
 discovery_api = AlfrescoDiscoveryAPI(alfresco_url, alfresco_username, alfresco_password)
+report_writer = ReportWriter()
 
 DOCUMENT_NOT_FOUND = "Document not found. Please try again."
 FOLDER_NOT_FOUND = "Folder not found. Please try again."
@@ -164,7 +166,14 @@ def list_recent_content_snippets(search_term: str) -> dict:
 
     return results
 
-tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file]
+@tool
+def create_pdf_report(document_title: str, document_text: str) -> str:
+    """Create a PDF report containing the given text content."""
+    report_writer.write_report(document_title, document_text)
+    node_api.upload_file(f"{document_title}.pdf", "8bb36efb-c26d-4d2b-9199-ab6922f53c28")
+    return f'{document_title}.pdf created!'
+
+tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, create_pdf_report]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:
@@ -185,6 +194,16 @@ example_messages = [
     ("user", "Redact all mentions of colors and names in 'snowwhite.docx'"), ("assistant", '{{"name": "redact_content", "arguments": {{"document_title": "snowwhite.docx", "user_request": "colors, names"}}}}'),
     ("user", "Show snippets of recent documents that contain the term 'contract'"), ("assistant", '{{"name": "list_recent_content_snippets", "arguments": {{"search_term": "contract"}}}}'),
     ("user", "Copy 'minutes.docx' to the 'Board Meetings' folder"), ("assistant", '{{"name": "copy_file", "arguments": {{"filename": "minutes.docx", "folder_name": "Board Meetings"}}}}'),
+    ("user", "Generate a pdf report about Alfresco Governance Services"), ("assistant", """{{"name": "create_pdf_report", "arguments": {{"document_title": "Alfresco Governance Services", "document_text": "Unlock the Power of Alfresco AGS
+
+Are you looking for a robust Records Management solution? Look no further than Alfresco AGS. With its advanced features, you can efficiently manage your organization's records and ensure compliance with regulatory requirements.
+
+Key Features:
+
+* Create non-electronic records: Declare physical records, such as paper documents or microfilm, as digital records within Alfresco.
+* Classify and declare files as records: Identify important files and classify them as records, ensuring they are properly managed and retained.
+* Import and export File Plan content: Seamlessly move content between File Plans, making it easy to build and manage your Records Management system.
+* Export search results: Quickly retrieve and export search results in Alfresco Content Package (ACP) format."}}}}""".replace('\n', '\\n')),
 ]
 prompt_messages += example_messages
 prompt_messages.append(("user", "{input}"))

@@ -78,6 +78,7 @@ services:
           ignore:
             - alfresco_ai_assistant.py
             - alfresco_api.py
+            - report_writer.py
     ports:
       - 8503:8503
 

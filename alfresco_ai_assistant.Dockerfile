@@ -12,9 +12,13 @@ COPY requirements.txt .
 
 RUN pip install --upgrade -r requirements.txt
 
+RUN mkdir -p static
+COPY static/*.png static
+
 COPY alfresco_ai_assistant.py .
 COPY alfresco_api.py .
 COPY commons.py .
+COPY report_writer.py .
 
 EXPOSE 8504
 

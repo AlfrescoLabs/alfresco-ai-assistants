@@ -51,6 +51,11 @@ class AlfrescoNodeAPI(AlfrescoAPI):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/content?attachment=false"
         return requests.get(url, auth=self.auth).content.decode("utf-8")
 
+    def upload_file(self, file_path: str, parent_id: str):
+        url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{parent_id}/children"
+        files = {"filedata": open(file_path, "rb")}
+        return requests.post(url, files=files, auth=self.auth).json()
+
     def copy_to_folder(self, node_id: str, folder_id: str):
         url = f"{self.base_url}/alfresco/api/-default-/public/alfresco/versions/1/nodes/{node_id}/copy"
         body = {

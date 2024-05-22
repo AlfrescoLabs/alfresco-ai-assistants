@@ -1,4 +1,5 @@
 *
 !*.py
+!static/*.png
 !requirements.txt
 !initial-load/*
