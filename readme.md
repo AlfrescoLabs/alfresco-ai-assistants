@@ -16,25 +16,60 @@ The database can be explored at http://localhost:7474.
 
 ### App 1 - Alfresco Docs Bot
 
+```mermaid
+graph TB
+user(User 👤)
+llm(LLM 🤖)
+vectordb[(Vector database)]
+raw-docs{{Raw Documentation 📚}}
+
+user --query--> llm
+
+llm --load--> vectordb
+
+vectordb --relevant-data--> llm
+
+llm --final answer--> user
+
+raw-docs --extraction/chunking/embedding---> vectordb
+```
+
 UI: http://localhost:8503
 DB: http://localhost:7474
 
 - answer questions based on the specified product's documentation
 - answers will purely be based on Alfresco Docs content
 
-```mermaid
-graph LR
-user
-ai
-
-user --query--> ai
-
-ai --load--> RAG-user-docs
-
-ai --final answer--> user
-```
-
 ### App 2 - Alfredo, the Alfresco AI Assistant
+
+```mermaid
+graph BT
+user(User 👤)
+llm(LLM 🤖)
+api
+
+subgraph api[API 👷]
+  discovery-api
+  search-api
+  node-api
+end
+
+subgraph tools[Tools 🛠️]
+  discovery
+  transform
+  redact
+end
+
+user --query--> llm
+
+llm --choose--> tools
+
+tools --invoke--> api
+
+api --feed data--> llm
+
+llm --final answer--> user
+```
 
 UI: http://localhost:8504
 DB: http://localhost:7474
@@ -47,35 +82,6 @@ DB: http://localhost:7474
 - copy a document into a specified folder
 - answer questions about the ACS deployment
 - generate PDF reports and upload them to ACS
-
-```mermaid
-graph BT
-user
-ai
-api
-
-subgraph api
-  discovery-api
-  search-api
-  node-api
-end
-
-subgraph tools
-  discovery
-  transform
-  redact
-end
-
-user --query--> ai
-
-ai --choose--> tools
-
-tools --invoke--> api
-
-api --feed data--> ai
-
-ai --final answer--> user
-```
 
 ## Configure
 
