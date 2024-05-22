@@ -19,7 +19,7 @@ class AlfrescoSearchAPI(AlfrescoAPI):
         url = f"{self.base_url}/alfresco/api/-default-/public/search/versions/1/search"
         body = {
             "query": {
-                "query": f"cm:name:{folder_name} and TYPE:folder",
+                "query": f"cm:name:\"{folder_name}\" and TYPE:folder",
                 "language": "afts"
             }
         }
