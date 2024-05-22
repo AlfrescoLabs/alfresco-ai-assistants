@@ -167,7 +167,7 @@ def list_recent_content_snippets(search_term: str) -> dict:
     return results
 
 @tool
-def create_pdf_report(document_title, document_text) -> str:
+def create_pdf_report(document_title: str, document_text: str) -> str:
     """Create a PDF report containing the given text content."""
     report_writer.write_report(document_title, document_text)
     node_api.upload_file(f"{document_title}.pdf", "8bb36efb-c26d-4d2b-9199-ab6922f53c28")
