@@ -35,6 +35,7 @@ DB: http://localhost:7474
 - redact documents
 - copy a document into a specified folder
 - answer questions about the ACS deployment
+- generate PDF reports and upload them to ACS
 
 ---
 
