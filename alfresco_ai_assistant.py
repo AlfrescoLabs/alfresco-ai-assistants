@@ -1,6 +1,7 @@
 import os
 import uuid
 
+import json
 from alfresco_api import *
 import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
@@ -9,6 +10,8 @@ from langchain.tools.render import render_text_description
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from streamlit.logger import get_logger
 from langchain.globals import set_debug
+from langchain.chains import LLMChain
+from langchain.memory import ConversationBufferMemory
 from operator import itemgetter
 from commons import (
     load_llm,
@@ -74,6 +77,18 @@ The response must use the language required by the question and it must never mi
 
 Question: {question}""",
  input_variables=["json_response", "question"])
+
+
+history_template = """You are a nice chatbot having a conversation with a human.
+
+Previous conversation:
+{history}
+
+New human question: {question}
+Response:"""
+history_prompt = PromptTemplate.from_template(history_template)
+
+
 
 def get_document_content(document_title: str) -> dict:
     search_response = search_api.search_by_name(document_title)
@@ -164,7 +179,20 @@ def list_recent_content_snippets(search_term: str) -> dict:
 
     return results
 
-tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file]
+@tool
+def get_history(topic: str) -> str:
+    """Get the history of the conversation."""
+    conversation = LLMChain(
+        llm=llm,
+        prompt=history_prompt,
+        verbose=True,
+        memory=memory
+    )
+    response = conversation.predict(question="Show history of " + topic)
+    st.write(response)
+    return None
+
+tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, get_history]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:
@@ -196,6 +224,12 @@ def tool_chain(model_output):
     chosen_tool = tool_map[model_output["name"]]
     return itemgetter("arguments") | chosen_tool
 
+def save_memory(model_output):
+    memory.save_context({"input": model_output["question"]}, {"output": json.dumps(model_output["json_response"])})
+    return model_output
+
+memory = ConversationBufferMemory(return_messages=True)
+
 def main():
     chain = prompt | llm | JsonOutputParser() | tool_chain
 
@@ -207,7 +241,7 @@ def main():
     if input:
         response = chain.invoke({"input": input})
         if isinstance(response, dict):
-            json_chain = json_response_prompt | llm | StrOutputParser()
+            json_chain = save_memory | json_response_prompt | llm | StrOutputParser()
             response = json_chain.stream({"json_response": response, "question": input})
             st.write_stream(response)
         elif response:
