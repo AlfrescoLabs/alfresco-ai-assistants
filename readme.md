@@ -220,3 +220,9 @@ Scripts that may be required to prepare data for the applications to run correct
 
 [transformer.py](./scripts/transformer.py) is a script that should be run against a local clone of the [docs-alfresco](https://github.com/Alfresco/docs-alfresco)
 repository in order to create the `initial-load` folder with all the expected documentation for the Alfresco Docs bot.
+
+## Credits
+
+This project is based on
+[docker/genai-stack](https://github.com/docker/genai-stack) and is the outcome
+of a three-day internal hackathon at Hyland by the **Turing Titans** team.
