@@ -80,7 +80,7 @@ llm --final answer--> user
 - perform complex tasks against a live ACS instance based on human requests
 - find and preview documents
 - show recent document snippets matching a search term
-- transform (e.g.: translate/summarise/classify) documents
+- transform _(e.g.: translate/summarise/classify)_ documents
 - redact documents
 - copy a document into a specified folder
 - answer questions about the ACS deployment
