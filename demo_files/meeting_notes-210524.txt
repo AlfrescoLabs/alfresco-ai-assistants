@@ -1,0 +1,6 @@
+Meeting Notes Extract:
+
+    Meeting Date: May 21, 2024
+        Project Update: Juggler Products - New Juggling Balls Release
+            Task: Review the document provided by the "Circo Feliz" company (feliz_feedback.txt). @John Doe to handle this.
+            Task: Review the feedback document from the "Clown Therapy Association" (cta_feedback.txt). @John Doe to complete this.

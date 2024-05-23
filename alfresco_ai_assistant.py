@@ -33,6 +33,8 @@ alfresco_password = os.getenv("ALFRESCO_PASSWORD")
 # Remapping for Langchain Neo4j integration
 os.environ["NEO4J_URL"] = url
 
+st.set_page_config(page_title='Alfredo - Alfresco AI Assistant', page_icon='🤹‍♂️')
+
 # API clients
 search_api = AlfrescoSearchAPI(alfresco_url, alfresco_username, alfresco_password)
 node_api = AlfrescoNodeAPI(alfresco_url, alfresco_username, alfresco_password)
