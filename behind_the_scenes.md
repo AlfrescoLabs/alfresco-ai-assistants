@@ -6,15 +6,15 @@ It can be hard to understand exactly what is real from a demo, so we wanted to p
 
 The main application in the demo is Alfredo, the Alfresco AI Assistant. This uses an LLM and LangChain to automatically select the appropriate tool for each task.
 
-For the first task then Alfredo decides to use the `list_recent_content_snippets` tool. It is required to provide a search term, and picks `"John Doe"` out of the prompt. The Alfresco search API is invoked to find recent documents containing this term, and returns with a set of extracts from the documents that matched the search query. The LLM is then given the original prompt along with these extracts and uses them to construct a list of tasks.
+For the first task then Alfredo decides to use the `list_recent_content_snippets` tool. It is required to provide a search term, and picks `"John Doe"` out of the prompt. The Alfresco search API is invoked to find recent documents ([meeting notes 210524](demo_files/meeting_notes-210524.txt) and [meeting notes 220524](demo_files/meeting_notes-220524.txt)) containing this term, and returns with a set of extracts from the documents that matched the search query. The LLM is then given the original prompt along with these extracts and uses them to construct a list of tasks.
 
 ## Translate "feliz_feedback.txt" to English
 
-The first task that the user selects is to review a document and from the filename and author they immediately know it will be in Spanish. They ask the AI Assistant for an English translation and the LLM selects the `translate_content` tool. It automatically extracts the document title and language from the user prompt and supplies these as arguments. The tool then passes the content of the document to the LLM and requests that it is translated to the supplied language - it's able to automatically determine the source language. The resulting text is streamed to the UI.
+The first task that the user selects is to review a [document](demo_files/feliz_feedback.txt) and from the filename and author they immediately know it will be in Spanish. They ask the AI Assistant for an English translation and the LLM selects the `translate_content` tool. It automatically extracts the document title and language from the user prompt and supplies these as arguments. The tool then passes the content of the document to the LLM and requests that it is translated to the supplied language - it's able to automatically determine the source language. The resulting text is streamed to the UI.
 
 ## Summarise "cta_feedback.txt" including all important details
 
-The meeting on the 21st of May contained two action items for the user. The second one was to review the feedback document from "Clown Therapy Association". Alfredo uses the prompt to select the `transform_content` tool and passes in the filename. Similar to the `translate_content` tool this makes a second request to the LLM, but this time the internal prompt is much more generic. This tool is capable of producing summaries of documents, determining an arbitrary classification of them (e.g. "Is the document a technical specification or marketing material?") or even rewriting the content as a poem. Here's an example of the last point using a football match report as a source document.
+The meeting on the 21st of May contained two action items for the user. The second one was to review the [feedback document](demo_files/cta_feedback.txt) from "Clown Therapy Association". Alfredo uses the prompt to select the `transform_content` tool and passes in the filename. Similar to the `translate_content` tool this makes a second request to the LLM, but this time the internal prompt is much more generic. This tool is capable of producing summaries of documents, determining an arbitrary classification of them (e.g. "Is the document a technical specification or marketing material?") or even rewriting the content as a poem. Here's an example of the last point using a football match report as a source document.
 
 ```
 Summarise EnglandColombia.txt formatting it as a limerick. Mention some key names.
@@ -28,7 +28,7 @@ Summarise EnglandColombia.txt formatting it as a limerick. Mention some key name
 
 ## Redact all PII in "presentation.txt"
 
-The summary picks out a note from the `cta_feedback.txt` that the presentation currently contains PII and that this must be redacted before it can be published. The user instructs the AI Assistant to redact all PII from `presentation.txt` and the tool correctly selects the `redact_content` tool supplying the title and the instruction of what should be redacted.
+The summary picks out a note from the `cta_feedback.txt` that the presentation currently contains PII and that this must be redacted before it can be published. The user instructs the AI Assistant to redact all PII from [presentation.txt](demo_files/presentation.txt) and the tool correctly selects the `redact_content` tool supplying the title and the instruction of what should be redacted.
 
 The LLM is smart enough to interpret "PII" and to recognise names and email addresses within the specified text. This works with other criteria too and allows users to redact particular types of data, rather than having to specify a full list of terms to redact.
 
