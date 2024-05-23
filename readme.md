@@ -3,6 +3,8 @@
 This repository contains several Alfresco [AI Assistants](https://en.wikipedia.org/wiki/Virtual_assistant) to help users
 and customers get the information they need or perform complex tasks, simply conveying each request via natural language.
 
+For a "behind the scenes" explanation of what is happening in our demo see [behind_the_scenes.md](behind_the_scenes.md).
+
 ## Applications
 
 This repository contains the following applications:
