@@ -170,7 +170,7 @@ def list_recent_content_snippets(search_term: str) -> dict:
 def create_pdf_report(document_title: str, document_text: str) -> str:
     """Create a PDF report containing the given text content."""
     report_writer.write_report(document_title, document_text)
-    node_api.upload_file(f"{document_title}.pdf", "8bb36efb-c26d-4d2b-9199-ab6922f53c28")
+    node_api.upload_file(f"{document_title}.pdf", "38745585-816a-403f-8005-0a55c0aec813")
     return f'{document_title}.pdf created!'
 
 tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, create_pdf_report]
