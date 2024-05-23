@@ -127,6 +127,57 @@ To use the Linux-GPU profile: run `docker compose --profile linux-gpu up`. Also 
 
 If, for whatever reason, you're unable to run the Ollama container, you can instead install it and run it locally as an alternative option.
 
+> You may want to reduce `num_ctx` to `3072` in [commons.py](commons.py) if you
+> are running on cheap GPU or CPU.
+
+#### Ollama on EKS
+
+Running Ollama locally may yield slow results. A possible solution is to run it
+on a cheap GPU-enabled EC2 instance which will perform better than any consumer
+grade GPU.
+
+To create an EKS cluster backed by a single `g4dn.xlarge` instance:
+
+```sh
+eksctl create cluster --name hack-turing-titans --node-type=g4dn.xlarge --nodes 1
+```
+
+Install ingress-nginx and cert-manager to expose ollama via https:
+
+```sh
+helm upgrade --install ingress-nginx ingress-nginx \
+--repo https://kubernetes.github.io/ingress-nginx \
+--namespace ingress-nginx --create-namespace
+```
+
+```sh
+helm install \
+cert-manager jetstack/cert-manager \
+--namespace cert-manager \
+--create-namespace \
+--set installCRDs=true
+```
+
+Manually create a DNS record pointing to the ingress-nginx ingress CNAME
+(retrieve it via `kubectl get service -n ingress-nginx`).
+
+Set your FQDN and apply the ClusterIssuer resource to enable LetsEncrypt
+certificates generation:
+
+```sh
+sed -i 's/my-ollama.example.com/YOUR_FQDN/g' k8s/letsencrypt-prod.yaml
+kubectl apply -f k8s/letsencrypt-prod.yaml
+```
+
+Finally install [Ollama chart](https://github.com/otwld/ollama-helm):
+
+```sh
+helm install ollama ollama-helm/ollama \
+--namespace ollama \
+--create-namespace \
+--values ollama.yaml
+```
+
 ## Develop
 
 > [!WARNING]
