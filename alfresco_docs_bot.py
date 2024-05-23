@@ -28,6 +28,8 @@ llm_name = os.getenv("LLM")
 # Remapping for Langchain Neo4j integration
 os.environ["NEO4J_URL"] = url
 
+st.set_page_config(page_title='Alfresco Docs Bot', page_icon='📚')
+
 logger = get_logger(__name__)
 
 prompt = PromptTemplate(

@@ -30,12 +30,12 @@ llm --final answer--> user
 raw-docs --extraction/chunking/embedding---> vectordb
 ```
 
-Access at:
+**Access at**:
 
 - UI: http://localhost:8503
 - DB: http://localhost:7474
 
-Features:
+**Features**:
 
 - answer questions based on the specified product's documentation
 - answers will purely be based on Alfresco Docs content
@@ -71,16 +71,16 @@ api --feed data--> llm
 llm --final answer--> user
 ```
 
-Access at:
+**Access at**:
 
 - UI: http://localhost:8504
 
-Features:
+**Features**:
 
 - perform complex tasks against a live ACS instance based on human requests
 - find and preview documents
 - show recent document snippets matching a search term
-- transform (e.g.: translate/summarise/classify) documents
+- transform _(e.g.: translate/summarise/classify)_ documents
 - redact documents
 - copy a document into a specified folder
 - answer questions about the ACS deployment
