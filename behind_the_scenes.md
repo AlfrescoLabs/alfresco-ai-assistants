@@ -2,11 +2,11 @@
 
 It can be hard to understand exactly what is real from a demo, so we wanted to provide an explanation of the various tasks being performed. In general we've tried to use real code and rely on the LLM to solve problems for us whereever possible.
 
-## Show all recent snippets containing "Alan Turing", include all tasks without fail
+## Show all recent snippets containing "John Doe", include all tasks without fail
 
-The main application in the demo is Alfredo the Alfresco AI Assistant. This uses an LLM and LangChain to automatically select the appropriate tool for each task.
+The main application in the demo is Alfredo, the Alfresco AI Assistant. This uses an LLM and LangChain to automatically select the appropriate tool for each task.
 
-For the first task then Alfredo decides to use the `list_recent_content_snippets` tool. It is required to provide a search term, and picks `"Alan Turing"` out of the prompt. The Alfresco search API is invoked to find recent documents containing this term, and returns with a set of extracts from the documents that matched the search query. The LLM is then given the original prompt along with these extracts and uses them to construct a list of tasks.
+For the first task then Alfredo decides to use the `list_recent_content_snippets` tool. It is required to provide a search term, and picks `"John Doe"` out of the prompt. The Alfresco search API is invoked to find recent documents containing this term, and returns with a set of extracts from the documents that matched the search query. The LLM is then given the original prompt along with these extracts and uses them to construct a list of tasks.
 
 ## Translate "feliz_feedback.txt" to English
 
@@ -14,7 +14,7 @@ The first task that the user selects is to review a document and from the filena
 
 ## Summarise "cta_feedback.txt" including all important details
 
-The meeting on the 21st of May contained two action items for the user. The second one was to review the feedback document from "Clown Therapy Association." Alfredo uses the prompt to select the `transform_content` tool and passes in the filename. Similar to the `translate_content` tool this makes a second request to the LLM, but this time the internal prompt is much more generic. This tool is capable of producing summaries of documents, determining an arbitrary classification of them (e.g. "Is the document a technical specification or marketing material?") or even rewriting the content as a poem. Here's an example of the last point using a football match report as a source document.
+The meeting on the 21st of May contained two action items for the user. The second one was to review the feedback document from "Clown Therapy Association". Alfredo uses the prompt to select the `transform_content` tool and passes in the filename. Similar to the `translate_content` tool this makes a second request to the LLM, but this time the internal prompt is much more generic. This tool is capable of producing summaries of documents, determining an arbitrary classification of them (e.g. "Is the document a technical specification or marketing material?") or even rewriting the content as a poem. Here's an example of the last point using a football match report as a source document.
 
 ```
 Summarise EnglandColombia.txt formatting it as a limerick. Mention some key names.
@@ -28,7 +28,7 @@ Summarise EnglandColombia.txt formatting it as a limerick. Mention some key name
 
 ## Redact all PII in "presentation.txt"
 
-The summary picks out a note from the `cta_feedback.txt` that the presentation currently contains PII and that this must be redacted before it can be published. The user instructs the Assistant AI to redact all PII from `presentation.txt` and the tool correctly selects the `redact_content` tool supplying the title and the instruction of what should be redacted.
+The summary picks out a note from the `cta_feedback.txt` that the presentation currently contains PII and that this must be redacted before it can be published. The user instructs the AI Assistant to redact all PII from `presentation.txt` and the tool correctly selects the `redact_content` tool supplying the title and the instruction of what should be redacted.
 
 The LLM is smart enough to interpret "PII" and to recognise names and email addresses within the specified text. This works with other criteria too and allows users to redact particular types of data, rather than having to specify a full list of terms to redact.
 
