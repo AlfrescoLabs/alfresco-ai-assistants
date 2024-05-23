@@ -127,6 +127,9 @@ To use the Linux-GPU profile: run `docker compose --profile linux-gpu up`. Also 
 
 If, for whatever reason, you're unable to run the Ollama container, you can instead install it and run it locally as an alternative option.
 
+> You may want to reduce `num_ctx` to `3072` in [commons.py](commons.py) if you
+> are running on cheap GPU or CPU.
+
 #### Ollama on EKS
 
 Running Ollama locally may yield slow results. A possible solution is to run it
