@@ -61,7 +61,16 @@ def load_llm(llm_name: str, logger=BaseLogger(), config={}):
         )
     elif llm_name == "llava":
         logger.info("LLM: Using Llava")
-        return Ollama(base_url=config["ollama_base_url"], model="llava")
+        return ChatOllama(
+            temperature=0,
+            base_url=config["ollama_base_url"],
+            model="llava",
+            streaming=True,
+            # seed=2,
+            top_k=10,  # A higher value (100) will give more diverse answers, while a lower value (10) will be more conservative.
+            top_p=0.3,  # Higher value (0.95) will lead to more diverse text, while a lower value (0.5) will generate more focused text.
+            num_ctx=3072,  # Sets the size of the context window used to generate the next token.
+        )
     elif len(llm_name):
         logger.info(f"LLM: Using Ollama: {llm_name}")
         return ChatOllama(
