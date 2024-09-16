@@ -1,3 +1,4 @@
+import base64
 import os
 import uuid
 
@@ -47,6 +48,8 @@ FOLDER_NOT_FOUND = "Folder not found. Please try again."
 logger = get_logger(__name__)
 set_debug(True)
 llm = load_llm(llm_name, logger=logger, config={"ollama_base_url": ollama_base_url})
+vision_llm = load_llm("llava", logger=logger, config={"ollama_base_url": ollama_base_url})
+
 
 redact_prompt = PromptTemplate(
     template="""Redact all references to {request} from the following document.
@@ -175,7 +178,14 @@ def create_pdf_report(document_title: str, document_text: str) -> str:
     node_api.upload_file(f"{document_title}.pdf", "8bb36efb-c26d-4d2b-9199-ab6922f53c28")
     return f'{document_title}.pdf created!'
 
-tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, create_pdf_report]
+@tool
+def describe_image(document_title: str, user_prompt: str) -> str:
+    """Explain, describe, analyze an image. Requires the whole, unprocessed, user prompt/input."""
+    document = get_document_content(document_title)
+    image_b64 = base64.b64encode(document["content"]).decode("utf-8")
+    return vision_llm.invoke(user_prompt if user_prompt else "Describe the image.", images=[image_b64])
+
+tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, create_pdf_report, describe_image]
 rendered_tools = render_text_description(tools)
 
 system_prompt = f"""You are a robot that only outputs JSON, and has access to the following set of tools. Here are the names and descriptions for each tool:
@@ -196,6 +206,7 @@ example_messages = [
     ("user", "Redact all mentions of colors and names in 'snowwhite.docx'"), ("assistant", '{{"name": "redact_content", "arguments": {{"document_title": "snowwhite.docx", "user_request": "colors, names"}}}}'),
     ("user", "Show snippets of recent documents that contain the term 'contract'"), ("assistant", '{{"name": "list_recent_content_snippets", "arguments": {{"search_term": "contract"}}}}'),
     ("user", "Copy 'minutes.docx' to the 'Board Meetings' folder"), ("assistant", '{{"name": "copy_file", "arguments": {{"filename": "minutes.docx", "folder_name": "Board Meetings"}}}}'),
+    ("user", "Describe the techQuest_1.jpg image, provide a count of the people depicted in the image"), ("assistant", '{{"name": "describe_image", "arguments": {{"document_title": "techQuest_1.jpg", "user_prompt": "Describe the techQuest_1.jpg image, provide a count of the people depicted in the image"}}}}'),
     ("user", "Generate a pdf report about Alfresco Governance Services"), ("assistant", """{{"name": "create_pdf_report", "arguments": {{"document_title": "Alfresco Governance Services", "document_text": "Unlock the Power of Alfresco AGS
 
 Are you looking for a robust Records Management solution? Look no further than Alfresco AGS. With its advanced features, you can efficiently manage your organization's records and ensure compliance with regulatory requirements.

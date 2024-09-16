@@ -27,6 +27,16 @@ services:
       - LLM=${LLM-llama3}
     tty: true
 
+  pull-llava:
+    image: genai-stack/pull-model:latest
+    build:
+      context: .
+      dockerfile: pull_model.Dockerfile
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
+      - LLM=llava
+    tty: true
+
   database:
     user: neo4j:neo4j
     image: neo4j:5.11

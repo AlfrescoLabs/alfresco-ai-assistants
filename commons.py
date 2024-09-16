@@ -7,6 +7,7 @@ from langchain_community.embeddings.sentence_transformer import SentenceTransfor
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatOllama
 from langchain_community.chat_models import BedrockChat
+from langchain_community.llms import Ollama
 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
@@ -58,6 +59,9 @@ def load_llm(llm_name: str, logger=BaseLogger(), config={}):
             model_kwargs={"temperature": 0.0, "max_tokens_to_sample": 1024},
             streaming=True,
         )
+    elif llm_name == "llava":
+        logger.info("LLM: Using Llava")
+        return Ollama(base_url=config["ollama_base_url"], model="llava")
     elif len(llm_name):
         logger.info(f"LLM: Using Ollama: {llm_name}")
         return ChatOllama(
