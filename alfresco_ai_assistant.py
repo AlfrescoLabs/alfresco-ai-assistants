@@ -183,9 +183,7 @@ def describe_image(document_title: str, user_prompt: str) -> str:
     """Explain, describe, analyze an image. Requires the whole, unprocessed, user prompt/input."""
     document = get_document_content(document_title)
     image_b64 = base64.b64encode(document["content"]).decode("utf-8")
-    response = vision_llm.stream(user_prompt if user_prompt else "Describe the image.", images=[image_b64])
-    st.write_stream(response)
-    return None
+    return vision_llm.invoke(user_prompt if user_prompt else "Describe the image.", images=[image_b64])
 
 tools = [discovery, transform_content, translate_content, redact_content, list_recent_content_snippets, copy_file, create_pdf_report, describe_image]
 rendered_tools = render_text_description(tools)
